@@ -55,47 +55,69 @@ def levenshtein_distance_rec(s1, s2):
 
     return rec(len(s1), len(s2))
 
+
 def main():
+    from rich.console import Console
+    from rich.table import Table
+    from rich import box
+
     from utils.measure_time import medir_tempo
+    from rich.panel import Panel
+
+    console = Console()
 
     def teste_basico():
-        print("--- Teste Básico ---")
         s1 = "Augusto"
-        s2 = "Augto"
+        s2 = "Arnaldo"
 
         # Teste Bottom-Up
         iter_distance, iter_time = medir_tempo(levenshtein_distance_iter, s1, s2)
-        print(f"Distância iterativa (Bottom-Up) entre '{s1}' e '{s2}': {iter_distance}")
-        print(f"Tempo iterativo: {iter_time} milisegundos\n")
 
         # Teste Top-Down
         rec_distance, rec_time = medir_tempo(levenshtein_distance_rec, s1, s2)
-        print(f"Distância recursiva (Top-Down) entre '{s1}' e '{s2}': {rec_distance}")
-        print(f"Tempo recursivo: {rec_time} milisegundos")
 
-        print(f"\nResultados iguais: {iter_distance == rec_distance}")
+        table = Table(box=box.SIMPLE)
+        table.add_column("Método", style="cyan", no_wrap=True)
+        table.add_column("Distância", style="magenta")
+        table.add_column("Tempo (ms)", style="green")
+
+        table.add_row("Iterativo (Bottom-Up)", str(iter_distance), f"{iter_time}")
+        table.add_row("Recursivo (Top-Down)", str(rec_distance), f"{rec_time}")
+
+        panel = Panel.fit(
+            table,
+            title=f"Teste Básico com '{s1}' e '{s2}'",
+            border_style="blue",
+            subtitle=f"[bold yellow]Resultados iguais:[/] {iter_distance == rec_distance}",
+        )
+        console.print(panel)
 
     def teste_desempenho():
-        print("\n--- Teste de Desempenho (100 caracteres) ---")
         random.seed(42)
         s1 = "".join(random.choices(string.ascii_letters, k=100))
         s2 = "".join(random.choices(string.ascii_letters, k=100))
 
         iter_distance, iter_time = medir_tempo(levenshtein_distance_iter, s1, s2)
-        print(
-            f"Distância iterativa (Bottom-Up) entre strings de 100 caracteres: {iter_distance}"
-        )
-        print(f"Tempo iterativo: {iter_time} milisegundos\n")
-
         rec_distance, rec_time = medir_tempo(levenshtein_distance_rec, s1, s2)
-        print(
-            f"Distância recursiva (Top-Down) entre strings de 100 caracteres: {rec_distance}"
-        )
-        print(f"Tempo recursivo: {rec_time} milisegundos")
 
-        print(f"\nResultados iguais: {iter_distance == rec_distance}")
+        table = Table(box=box.SIMPLE)
+        table.add_column("Método", style="cyan", no_wrap=True)
+        table.add_column("Distância", style="magenta")
+        table.add_column("Tempo (ms)", style="green")
+
+        table.add_row("Iterativo (Bottom-Up)", str(iter_distance), f"{iter_time}")
+        table.add_row("Recursivo (Top-Down)", str(rec_distance), f"{rec_time}")
+
+        panel = Panel.fit(
+            table,
+            title="Teste de Desempenho com 100 caracteres",
+            border_style="blue",
+            subtitle=f"[bold yellow]Resultados iguais:[/] {iter_distance == rec_distance}",
+        )
+        console.print(panel)
 
     teste_basico()
+    print("\n")
     teste_desempenho()
 
 

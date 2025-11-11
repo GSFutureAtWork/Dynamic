@@ -8,6 +8,25 @@ from rich import print as rprint
 
 from dp import levenshtein_distance_iter
 
+# Prompts usados para gerar respostas das LLMs. Cada prompt tem um arquivo de resposta para cada LLM na pasta data/llms/{llm}/p{num_prompt}.txt
+prompts = [
+    # Fatuais
+    "Qual o rio mais longo do mundo?",
+    "Quem foi a primeira pessoa a pisar na Lua?",
+    # Criativos
+    "Escreva um poema curto (quatro linhas) sobre uma xícara de café.",
+    "Descreva uma cidade futurista em um único parágrafo.",
+    # Código
+    "Escreva uma função em Python que inverte uma string.",
+    "Escreva a estrutura básica de um arquivo HTML5 (apenas as tags head e body).",
+    # Explicações Simples
+    "O que é um 'hash map' (ou dicionário) em programação? Explique de forma simples.",
+    "Explique o que é a fotossíntese para uma criança de 10 anos.",
+    # Opiniões
+    "Qual é melhor: iOS ou Android? Liste uma vantagem de cada.",
+    "O trabalho remoto é o futuro do trabalho? Justifique brevemente.",
+]
+
 
 def ler_arquivo(path):
     """Lê o conteúdo de um arquivo com tratamento de erro."""
@@ -125,13 +144,16 @@ def exibir_tabela_medias(all_distances):
 
 
 def main():
-    """Análise das distâncias de Levenshtein entre respostas de diferentes LLMs."""
     console = Console()
     llms = ["chatgpt", "deepseek", "gemini"]
     num_prompts = 10
 
+    rprint("\n[bold blue]Prompts utilizados:[/bold blue]\n")
+    for idx, prompt in enumerate(prompts, 1):
+        rprint(f"[cyan]P{idx}:[/cyan] {prompt}")
+
     rprint(
-        "\n[bold green]📊 Tabela de Distâncias de Levenshtein Prompt a Prompt[/bold green]\n"
+        "\n\n[bold green]📊 Tabela de Distâncias de Levenshtein Prompt a Prompt[/bold green]\n"
     )
 
     pares, all_distances, resultados = calcular_distancias(
@@ -141,7 +163,6 @@ def main():
     console.print(table)
 
     rprint("\n\n[bold green]🏆 Distância Geral (Média | Mediana)[/bold green]\n")
-    rprint("Calculada como a [bold]média[/bold] das distâncias dos 10 prompts.")
 
     avg_table = exibir_tabela_medias(all_distances)
     console.print(avg_table)
