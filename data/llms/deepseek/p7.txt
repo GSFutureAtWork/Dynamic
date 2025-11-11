@@ -1,0 +1,1 @@
+Um hash map (ou dicionário) é como uma lista de contatos no seu celular: você procura pelo nome (a chave) para encontrar o número de telefone (o valor). Em vez de ter que olhar todos os contatos um por um, o telefone usa um truque rápido (a função hash) para levar você diretamente ao número que você quer, tornando a busca muito rápida.

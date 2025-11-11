@@ -1,0 +1,8 @@
+def inverte_string(s):
+  """Inverte uma string usando fatiamento (slicing) de Python."""
+  return s[::-1]
+
+# Exemplo de uso
+# texto = "Olá mundo"
+# invertido = inverte_string(texto)
+# print(invertido) # Resultado: odnum alO

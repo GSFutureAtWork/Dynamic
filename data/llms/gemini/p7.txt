@@ -1,0 +1,7 @@
+Um hash map (em Python, é chamado de dicionário) é como uma lista telefônica super-rápida. Em vez de procurar um valor pelo seu número (como em uma lista comum), você o procura pelo seu nome, que chamamos de chave.
+
+Chave (Key): É o "nome" único que você usa para encontrar a informação (ex: "CPF", "Nome do Produto").
+
+Valor (Value): É a informação associada a essa chave (ex: "123.456.789-00", "Smartphone X").
+
+Ele armazena pares de chave-valor, permitindo que você encontre o valor associado a uma chave quase instantaneamente, sem ter que percorrer toda a lista. É fundamental para buscar e armazenar dados de forma eficiente.

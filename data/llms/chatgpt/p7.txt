@@ -1,0 +1,1 @@
+Um hash map (ou dicionário em Python) é uma estrutura de dados que guarda informações em pares de chave e valor. É como uma lista com etiquetas: em vez de procurar pela posição, você procura pela chave, e o computador encontra o valor rapidamente.

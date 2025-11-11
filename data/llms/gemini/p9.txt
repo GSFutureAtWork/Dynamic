@@ -1,0 +1,5 @@
+Ambos são excelentes, mas a escolha depende da sua prioridade.
+
+iOS (Apple): A principal vantagem é a integração e a segurança. O sistema é altamente otimizado para o hardware da Apple, resultando em uma experiência de usuário geralmente mais fluida e segura contra malware.
+
+Android (Google): A principal vantagem é a personalização e a diversidade de hardware. Oferece mais opções de customização do sistema operacional e está disponível em uma vasta gama de aparelhos, preços e fabricantes.
