@@ -52,7 +52,8 @@ def merge_sort(data):
     return merged_list
 
 
-def main():
+def big_o_analysis():
+    """Função para analisar e comparar a complexidade de Insertion Sort e Merge Sort."""
     # import random
     import math
     from rich.console import Console
@@ -62,7 +63,7 @@ def main():
     from utils.measure_time import medir_tempo
 
     # ------------------------------- Configuração ------------------------------- #
-    N_ITEMS = 100
+    N_ITEMS = 1000
     console = Console()
 
     console.print(
@@ -71,12 +72,12 @@ def main():
     data_to_sort = list(range(N_ITEMS, 0, -1))
     # data_to_sort = [random.randint(0, 5000) for _ in range(N_ITEMS)] # Caso médio
 
-    console.print("\nExecutando [bold red]Insertion Sort (O(n²))...[/]")
+    console.print("\nExecutando [bold red]Insertion Sort...[/]")
     _, time_insert = medir_tempo(insertion_sort, data_to_sort)
     console.print(f"Tempo de execução: [bold red]{time_insert} ms[/]")
 
-    console.print("\nExecutando [bold green]Merge Sort (O(n log n))...[/]")
-    result_merge, time_merge = medir_tempo(merge_sort, data_to_sort)
+    console.print("\nExecutando [bold green]Merge Sort...[/]")
+    _, time_merge = medir_tempo(merge_sort, data_to_sort)
     console.print(f"Tempo de execução: [bold green]{time_merge} ms[/]")
 
     table = Table(title="\n\nAnálise de Complexidade (Big O)", show_lines=True)
@@ -124,7 +125,3 @@ def main():
             border_style="bright_magenta",
         )
     )
-
-
-if __name__ == "__main__":
-    main()

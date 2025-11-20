@@ -6,26 +6,35 @@ from rich.table import Table
 from rich.text import Text
 from rich import print as rprint
 
-from dp import levenshtein_distance_iter
+from core.dp import (
+    longest_common_subsequence_iter,
+    longest_common_substring_iter,
+    levenshtein_distance_iter,
+)
 
 # Prompts usados para gerar respostas das LLMs. Cada prompt tem um arquivo de resposta para cada LLM na pasta data/llms/{llm}/p{num_prompt}.txt
-prompts = [
-    # Fatuais
-    "Qual o rio mais longo do mundo?",
-    "Quem foi a primeira pessoa a pisar na Lua?",
-    # Criativos
-    "Escreva um poema curto (quatro linhas) sobre uma xícara de café.",
-    "Descreva uma cidade futurista em um único parágrafo.",
-    # Código
-    "Escreva uma função em Python que inverte uma string.",
-    "Escreva a estrutura básica de um arquivo HTML5 (apenas as tags head e body).",
-    # Explicações Simples
-    "O que é um 'hash map' (ou dicionário) em programação? Explique de forma simples.",
-    "Explique o que é a fotossíntese para uma criança de 10 anos.",
-    # Opiniões
-    "Qual é melhor: iOS ou Android? Liste uma vantagem de cada.",
-    "O trabalho remoto é o futuro do trabalho? Justifique brevemente.",
-]
+prompts = {
+    "Fatuais": [
+        "Qual o rio mais longo do mundo?",
+        "Quem foi a primeira pessoa a pisar na Lua?",
+    ],
+    "Criativos": [
+        "Escreva um poema curto (quatro linhas) sobre uma xícara de café.",
+        "Descreva uma cidade futurista em um único parágrafo.",
+    ],
+    "Código": [
+        "Escreva uma função em Python que inverte uma string.",
+        "Escreva a estrutura básica de um arquivo HTML5 (apenas as tags head e body).",
+    ],
+    "Explicações Simples": [
+        "O que é um 'hash map' (ou dicionário) em programação? Explique de forma simples.",
+        "Explique o que é a fotossíntese para uma criança de 10 anos.",
+    ],
+    "Opiniões": [
+        "Qual é melhor: iOS ou Android? Liste uma vantagem de cada.",
+        "O trabalho remoto é o futuro do trabalho? Justifique brevemente.",
+    ],
+}
 
 
 def ler_arquivo(path):
@@ -44,7 +53,9 @@ def ler_arquivo(path):
         return None
 
 
-def calcular_distancias(llms, num_prompts, ler_arquivo_func):
+def calcular_distancias(
+    llms, num_prompts, ler_arquivo_func, algorithm=levenshtein_distance_iter
+):
     """Calcula as distâncias de Levenshtein entre pares de LLMs para cada prompt."""
     pares = [
         (llms[0], llms[1]),
@@ -79,7 +90,7 @@ def calcular_distancias(llms, num_prompts, ler_arquivo_func):
 
         distancias = {}
         for l1, l2 in pares:
-            dist = levenshtein_distance_iter(conteudos[l1], conteudos[l2])
+            dist = algorithm(conteudos[l1], conteudos[l2])
             chave = f"{l1}-{l2}"
             all_distances[chave].append(dist)
             distancias[chave] = dist
@@ -89,11 +100,18 @@ def calcular_distancias(llms, num_prompts, ler_arquivo_func):
     return pares, all_distances, resultados
 
 
-def exibir_tabela_distancias(pares, resultados):
-    """Exibe a tabela de distâncias de Levenshtein para cada prompt."""
-    table = Table(
-        title="Distâncias de Levenshtein (Primeiros 100 chars)", show_lines=True
-    )
+def exibir_tabela_distancias(pares, resultados, algorithm=levenshtein_distance_iter):
+    """Exibe a tabela de distâncias para cada prompt, usando o algoritmo especificado."""
+    if algorithm == levenshtein_distance_iter:
+        title = "Distâncias de Levenshtein (Primeiros 100 chars)"
+    elif algorithm == longest_common_subsequence_iter:
+        title = "Subsequência Comum Mais Longa (Primeiros 100 chars)"
+    elif algorithm == longest_common_substring_iter:
+        title = "Substring Comum Mais Longa (Primeiros 100 chars)"
+    else:
+        title = "Comparação de Respostas (Primeiros 100 chars)"
+
+    table = Table(title=title, show_lines=True)
     table.add_column("Prompt", style="cyan", justify="center")
     for l1, l2 in pares:
         table.add_column(
@@ -105,8 +123,7 @@ def exibir_tabela_distancias(pares, resultados):
             table.add_row(
                 f"P{i}",
                 Text("ERRO DE ARQUIVO", style="bold red", justify="center"),
-                "",
-                "",
+                *([""] * (len(pares) - 1)),
             )
         else:
             row_data = [f"P{i}"]
@@ -143,30 +160,47 @@ def exibir_tabela_medias(all_distances):
     return avg_table
 
 
-def main():
+def show_llm_prompts():
+    rprint("\n[bold blue]Prompts utilizados:[/bold blue]\n")
+    for categoria, lista_prompts in prompts.items():
+        rprint(f"[bold magenta]{categoria}:[/bold magenta]")
+        for i, prompt in enumerate(lista_prompts, start=1):
+            rprint(f"  [green]{i}.[/green] {prompt}")
+        rprint("")  # Linha em branco entre categorias
+
+
+def compare_llm_responses(algorithm=levenshtein_distance_iter):
     console = Console()
     llms = ["chatgpt", "deepseek", "gemini"]
     num_prompts = 10
 
-    rprint("\n[bold blue]Prompts utilizados:[/bold blue]\n")
-    for idx, prompt in enumerate(prompts, 1):
-        rprint(f"[cyan]P{idx}:[/cyan] {prompt}")
+    if algorithm == levenshtein_distance_iter:
+        text = "\n\n[bold green]📊 Tabela de Distâncias de Levenshtein Prompt a Prompt[/bold green]\n"
+    elif algorithm == longest_common_subsequence_iter:
+        text = "\n\n[bold green]📊 Tabela de Subsequências Comuns Mais Longas Prompt a Prompt[/bold green]\n"
+    elif algorithm == longest_common_substring_iter:
+        text = "\n\n[bold green]📊 Tabela de Substrings Comuns Mais Longas Prompt a Prompt[/bold green]\n"
+    else:
+        text = (
+            "\n\n[bold yellow]📊 Tabela de Comparação Prompt a Prompt[/bold yellow]\n"
+        )
 
-    rprint(
-        "\n\n[bold green]📊 Tabela de Distâncias de Levenshtein Prompt a Prompt[/bold green]\n"
-    )
+    rprint(text)
 
     pares, all_distances, resultados = calcular_distancias(
-        llms, num_prompts, ler_arquivo
+        llms, num_prompts, ler_arquivo, algorithm
     )
     table = exibir_tabela_distancias(pares, resultados)
     console.print(table)
 
-    rprint("\n\n[bold green]🏆 Distância Geral (Média | Mediana)[/bold green]\n")
+    if algorithm == levenshtein_distance_iter:
+        rprint("\n\n[bold green]🏆 Distâncias de Levenshtein Gerais[/bold green]\n")
+    elif algorithm == longest_common_subsequence_iter:
+        rprint(
+            "\n\n[bold green]🏆 Subsequências Comuns Mais Longas Gerais[/bold green]\n"
+        )
+    elif algorithm == longest_common_substring_iter:
+        rprint("\n\n[bold green]🏆 Substrings Comuns Mais Longas Gerais[/bold green]\n")
 
     avg_table = exibir_tabela_medias(all_distances)
     console.print(avg_table)
-
-
-if __name__ == "__main__":
-    main()
